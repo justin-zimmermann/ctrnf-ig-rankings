@@ -33,8 +33,46 @@ class AggregateRankingCalculator():
             self.fetch_rankings_from_csv(mode_index, mode)
 
         self.get_all_users()
-        self.write_af(exclude_glitched_tracks=False, total_times=False, exclude_glitched_times=True,
-                      threshold=10)
+        #self.write_af(exclude_glitched_tracks=True, total_times=True, exclude_glitched_times=True,
+         #             threshold=0)
+        self.get_matchup_psn("ctr4ever-Justin", "Rc_BTF", "Romu_romoon", "tapiocacrash", "LikeKatsu")
+
+    def track_names(self, i):
+        name = {0: "Crash Cove",
+                1: "Roo Tubes",
+                2: "Mystery Caves",
+                3: "Sewer Speedway",
+                4: "Slide Coliseum",
+                5: "Turbo Track",
+                6: "Coco Park",
+                7: "Tiger Temple",
+                8: "Papu Pyramid",
+                9: "Dingo Canyon",
+                10: "Blizzard Bluff",
+                11: "Dragon Mines",
+                12: "Polar Pass",
+                13: "Tiny Arena",
+                14: "Ngin Labs",
+                15: "Cortex Castle",
+                16: "Hot Air Skyway",
+                17: "Oxide Station",
+                18: "Inferno Island",
+                19: "Jungle Boogie",
+                20: "Tiny Temple",
+                21: "Meteor George",
+                22: "Barin Ruins",
+                23: "Deep Sea Driving",
+                24: "Out Of Time",
+                25: "Clockwork Wumpa",
+                26: "Thunderstruck",
+                27: "Assembly Lane",
+                28: "Android Alley",
+                29: "Electron Avenue",
+                30: "Hyper Spaceway",
+                31: "Twilight Tour",
+                32: "Prehistoric Playground",
+                33: "Spyro Circuit"}
+        return name[i]
 
     def get_track_limits(self):
         res = requests.get(r"https://crashteamranking.com/nfrecords/")
@@ -102,6 +140,26 @@ class AggregateRankingCalculator():
             self.all_users = self.all_users.union(set([(self.user_list[j][i], self.platform_list[j][i]) for i in range(
             len(self.platform_list[j]))]))
             #
+
+    def get_matchup_psn(self, *player):
+        points = []
+        for p in player:
+            points.append(0)
+            if (p, "psn") not in self.all_users:
+                return None
+        for track in range(len(self.user_list)):
+            whichp = 0
+            print("\n%s:" % self.track_names(track))
+            for position in range(len(self.user_list[track])):
+                for i, p in enumerate(player):
+                    if self.user_list[track][position] == p:
+                        print("%s: %f" % (p, self.time_list[track][position]))
+                        if whichp == 0:
+                            whichp = 1
+                            points[i] += 1
+        for i, p in enumerate(player):
+            print("%s: %d" % (p, points[i]))
+        return None
 
     def write_af(self, exclude_glitched_tracks=False, total_times=False, exclude_glitched_times=False, threshold=0):
         af=[]
