@@ -2,7 +2,7 @@
 
 in order to run this script you need Python 3.0 or higher.
 
-You also need the library "requests".
+You also need the library "requests" (type: "pip install requests" in the terminal once you've installed python)
 
 To fetch all rankings from activision database, go in the terminal, move into the directory of the project
 and type "python write_ranking.py". The rankings for each track will be written into a .csv file in the folder
