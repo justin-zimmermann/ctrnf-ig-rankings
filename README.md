@@ -9,3 +9,5 @@ and type "python write_ranking.py". The rankings for each track will be written 
 "output" which you created. Note that this will take a long time to execute.
 
 To calculate af once you have the rankings, run "python af.py". The result will be in a .csv file in the output folder.
+
+I'm working on including player matchups, total points, and improving the interface.
