@@ -19,13 +19,14 @@ import re
 
 class AggregateRankingCalculator():
 
-    def __init__(self):
+    def __init__(self, player):
         self.user_list = [[] for _ in range(34)]
         self.time_list = [[] for _ in range(34)]
         self.days_since_record_list = [[] for _ in range(34)]
         self.platform_list = [[] for _ in range(34)]
         self.all_users = {}  # set of all different users
         self.limits = []
+        self.player = player
 
     def run(self):
         mode_list = list(chain(range(1, 36, 2), range(39, 64, 2), range(77, 82, 2))) #list skipping even numbers (relic races)
@@ -33,8 +34,7 @@ class AggregateRankingCalculator():
             self.fetch_rankings_from_csv(mode_index, mode)
 
         self.get_all_users()
-        self.write_af(exclude_glitched_tracks=True, total_times=True, exclude_glitched_times=True,
-                      threshold=0)
+        self.get_player(self.player)
 
     def track_names(self, i):
         name = {0: "Crash Cove",
@@ -140,79 +140,35 @@ class AggregateRankingCalculator():
             len(self.platform_list[j]))]))
             #
 
-    def write_af(self, exclude_glitched_tracks=False, total_times=False, exclude_glitched_times=False, threshold=0):
-        af=[]
-        if total_times == True:
-            filename = "tt"
-            threshold = 0
-        else:
-            filename = "af"
-        if exclude_glitched_tracks == True:
-            track_list = list(chain(range(0, 1), range(2, 5), range(10, 14), range(15, 16), range(18, 25), range(
-                27, 29), range(30, 31)))
-            #print(track_list)
-            extra = "_no_glitched_tracks"
-        else:
-            track_list = list(range(34))
-            extra = ""
-        if exclude_glitched_times == True:
-            self.limits = self.get_track_limits()
-            self.glitched_positions = self.get_glitched_positions()
-            print(self.limits, self.glitched_positions, len(self.limits), len(self.glitched_positions))
-            extra2 = "_no_glitched_times"
-        else:
-            extra2 = ""
-        n_tracks = len(track_list)
-        if threshold == 0:
-            threshold = n_tracks
-        extra3 = "_%s" % threshold
-        iter_count = 0
-        for user in self.all_users:
-            iter_count += 1
-            if iter_count % 100 == 0:
-                print(iter_count, " out of ", len(self.all_users))
-            has_af = True
-            submission_number = n_tracks
-            sum_position = 0
-            sum_days = 0
-            for track in track_list:
-                has_pos = False
-                for position in range(len(self.user_list[track])):
-                    if (user[0] == self.user_list[track][position]) & (user[1] == self.platform_list[track][position]) & (
-                            (exclude_glitched_times == False) | (self.time_list[track][position] >= self.limits[track])
-                    ):
-                        if total_times == False:
-                            sum_position += position + 1 - self.glitched_positions[track]
-                        else:
-                            sum_position += self.time_list[track][position]
-                        if user[0] == "ctr4ever-Justin":
-                            print(position + 1 - self.glitched_positions[track])
-                        sum_days += self.days_since_record_list[track][position]
-                        has_pos = True
-                        break
-                if has_pos == False:
-                    submission_number -= 1
-                    if submission_number < threshold:
-                        has_af = False
-                        break
-            if has_af == True:
-                if total_times == False:
-                    sum_position /= float(submission_number)
-                sum_days /= float(submission_number)
-                af.append((sum_position, submission_number, user, sum_days))
-        af.sort()
-        print("Writing AF to file")
-        with open("output/%s%s%s%s.csv" % (filename, extra, extra2, extra3), 'w') as out:
-            for i, entry in enumerate(af):
-                #print("%s;%s;%s;%s;%s" % (i+1, entry[0], entry[1][0], entry[1][1], entry[2]))
-                out.write("%s;%s;%s;%s;%s;%s\n" % (i+1, entry[0], entry[1], entry[2][0], entry[2][1], entry[3]))
+    def get_player(self, player):
+        order = []
+        lines = []
+        if (player, "psn") not in self.all_users and (player, "xbl") not in self.all_users and (
+                player, "switch") not in self.all_users:
+            print("Error: %s is not in the player database. Exiting program." % player)
+            return None
+        for track in range(len(self.user_list)):
+            tr = "\n%s:" % self.track_names(track)
+            for position in range(len(self.user_list[track])):
+                if self.user_list[track][position] == player:
+                    lines.append("%s: %f (%f)" % (tr, self.time_list[track][position], self.days_since_record_list[
+                        track][position]))
+                    order.append(self.days_since_record_list[track][position])
+        lines = [line for _,line in sorted(zip(order,lines))]
+        print("Player: %s" % player)
+        print("Track: Time (Days since record)")
+        for line in lines:
+            print(line)
+        return None
 
 def main():
-    if len(sys.argv) != 1:
-        print("correct usage: python %s" % sys.argv[0])
+    if len(sys.argv) != 2:
+        print("correct usage: python %s [player]" % sys.argv[0])
         exit()
 
-    af_calc = AggregateRankingCalculator()
+    player = sys.argv[1]
+
+    af_calc = AggregateRankingCalculator(player)
 
     af_calc.run()
 
