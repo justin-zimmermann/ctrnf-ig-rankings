@@ -140,6 +140,12 @@ class AggregateRankingCalculator():
             len(self.platform_list[j]))]))
             #
 
+    def format_time(self, time):
+        if time - (int(time) // 60)*60 < 10:
+            return "%d:0%.2f" % (int(time) / 60, time - (int(time) // 60)*60)
+        else:
+            return "%d:%.2f" % (int(time) / 60, time - (int(time) // 60) * 60)
+
     def get_matchup(self, player):
         points = []
         for p in player:
@@ -154,7 +160,7 @@ class AggregateRankingCalculator():
             for position in range(len(self.user_list[track])):
                 for i, p in enumerate(player):
                     if self.user_list[track][position] == p:
-                        print("%s: %f" % (p, self.time_list[track][position]))
+                        print("%s: %s" % (p, self.format_time(self.time_list[track][position])))
                         if whichp == 0:
                             whichp = 1
                             points[i] += 1

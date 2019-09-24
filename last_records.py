@@ -140,6 +140,12 @@ class AggregateRankingCalculator():
             len(self.platform_list[j]))]))
             #
 
+    def format_time(self, time):
+        if time - (int(time) // 60)*60 < 10:
+            return "%d:0%.2f" % (int(time) / 60, time - (int(time) // 60)*60)
+        else:
+            return "%d:%.2f" % (int(time) / 60, time - (int(time) // 60) * 60)
+
     def get_player(self, player):
         order = []
         lines = []
@@ -151,8 +157,8 @@ class AggregateRankingCalculator():
             tr = "\n%s:" % self.track_names(track)
             for position in range(len(self.user_list[track])):
                 if self.user_list[track][position] == player:
-                    lines.append("%s: %f (%f)" % (tr, self.time_list[track][position], self.days_since_record_list[
-                        track][position]))
+                    lines.append("%s %s (%f)" % (tr, self.format_time(self.time_list[track][position]),
+                                                  self.days_since_record_list[track][position]))
                     order.append(self.days_since_record_list[track][position])
         lines = [line for _,line in sorted(zip(order,lines))]
         print("Player: %s" % player)

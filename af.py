@@ -33,8 +33,8 @@ class AggregateRankingCalculator():
             self.fetch_rankings_from_csv(mode_index, mode)
 
         self.get_all_users()
-        self.write_af(exclude_glitched_tracks=True, total_times=True, exclude_glitched_times=True,
-                      threshold=0)
+        self.write_af(exclude_glitched_tracks=False, total_times=False, exclude_glitched_times=True,
+                      threshold=10)
 
     def track_names(self, i):
         name = {0: "Crash Cove",
@@ -185,8 +185,8 @@ class AggregateRankingCalculator():
                             sum_position += position + 1 - self.glitched_positions[track]
                         else:
                             sum_position += self.time_list[track][position]
-                        if user[0] == "ctr4ever-Justin":
-                            print(position + 1 - self.glitched_positions[track])
+                        #if user[0] == "ctr4ever-Justin":
+                         #   print(position + 1 - self.glitched_positions[track])
                         sum_days += self.days_since_record_list[track][position]
                         has_pos = True
                         break
