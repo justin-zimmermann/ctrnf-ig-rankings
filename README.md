@@ -14,7 +14,11 @@ and type
 python write_ranking.py
 ```
 The rankings for each track will be written into a .csv file in the folder
-"output" which you created. Note that this will take a long time to execute.
+"output" which you created. 
+
+Note that this will overwrite any ranking you had in the output folder! To keep both your old rankings and the new one you want to fetch, create a new output folder and rename the old one!
+
+Also please note that this will take a long time to execute.
 
 To calculate af once you have the rankings, run 
 ```shell
@@ -48,4 +52,4 @@ and
 ```shell
 python last_records.py player date/ranking
 ```
-I'm working on adding points ranking, and automatically restarting time fetching in case of server connection failure.
+I'm working on adding points ranking, asking the user for permission to overwrite files, and automatically restarting time fetching in case of server connection failure.
