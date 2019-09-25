@@ -1,6 +1,6 @@
 # ctrnf-ig-rankings
 
-in order to run this script you need Python 3.0 or higher.
+in order to run this script you need a Python 3 installation.
 
 You also need the library "requests" (type: 
 ```shell
