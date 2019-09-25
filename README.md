@@ -8,11 +8,14 @@ To fetch all rankings from activision database, go in the terminal, move into th
 and type "python write_ranking.py". The rankings for each track will be written into a .csv file in the folder
 "output" which you created. Note that this will take a long time to execute.
 
-To calculate af once you have the rankings, run "python af.py". The result will be in a .csv file in the output folder.
+To calculate af once you have the rankings, run "python af.py". You will be prompted to enter values to specify which kind of ranking you want (total times/average finish, with/without glitched times, minimum number of submissions to appear in the ranking). Type the value you want and press Enter each time.
+The result of the script will be in a .csv file in the output folder.
 
 To get matchups vs several other players, run "python matchups.py "player1" "player2" "etc..."" replacing playerX with the usernames of the players you want to compare. This is especially useful to gauge the strength of an online lobby.
 
-To get a player's last records, in the order they were made from most recent to oldest, run "python last_records.py "player"", replacing player with the username of the player you want the times of.
+To get a player's last records, in the order they were made from most recent to oldest, run "python last_records.py "player" date", replacing player with the username of the player you want the times of.
+If instead you want records in the order from best to worst ranking, run 
+'''python last_records.py "player" ranking'''.
 
 Note the "" are not necessary unless the player has a whitespace character in his username, which can only happen on xbox. If there are no whitespaces, you can just run: "python matchups.py player1 player2 etc..." and "python last_records.py player"
 
