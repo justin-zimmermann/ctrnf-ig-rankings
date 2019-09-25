@@ -142,9 +142,9 @@ class AggregateRankingCalculator():
 
     def format_time(self, time):
         if time - (int(time) // 60)*60 < 10:
-            return "%d:0%.2f" % (int(time) / 60, time - (int(time) // 60)*60)
+            return "%d:0%.3f" % (int(time) / 60, time - (int(time) // 60)*60)
         else:
-            return "%d:%.2f" % (int(time) / 60, time - (int(time) // 60) * 60)
+            return "%d:%.3f" % (int(time) / 60, time - (int(time) // 60) * 60)
 
     def get_matchup(self, player):
         points = []

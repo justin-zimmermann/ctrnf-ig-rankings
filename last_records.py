@@ -19,7 +19,7 @@ import re
 
 class AggregateRankingCalculator():
 
-    def __init__(self, player):
+    def __init__(self, player, order):
         self.user_list = [[] for _ in range(34)]
         self.time_list = [[] for _ in range(34)]
         self.days_since_record_list = [[] for _ in range(34)]
@@ -27,6 +27,7 @@ class AggregateRankingCalculator():
         self.all_users = {}  # set of all different users
         self.limits = []
         self.player = player
+        self.order = order
 
     def run(self):
         mode_list = list(chain(range(1, 36, 2), range(39, 64, 2), range(77, 82, 2))) #list skipping even numbers (relic races)
@@ -142,9 +143,9 @@ class AggregateRankingCalculator():
 
     def format_time(self, time):
         if time - (int(time) // 60)*60 < 10:
-            return "%d:0%.2f" % (int(time) / 60, time - (int(time) // 60)*60)
+            return "%d:0%.3f" % (int(time) / 60, time - (int(time) // 60)*60)
         else:
-            return "%d:%.2f" % (int(time) / 60, time - (int(time) // 60) * 60)
+            return "%d:%.3f" % (int(time) / 60, time - (int(time) // 60) * 60)
 
     def get_player(self, player):
         order = []
@@ -157,24 +158,30 @@ class AggregateRankingCalculator():
             tr = "\n%s:" % self.track_names(track)
             for position in range(len(self.user_list[track])):
                 if self.user_list[track][position] == player:
-                    lines.append("%s %s (%f)" % (tr, self.format_time(self.time_list[track][position]),
-                                                  self.days_since_record_list[track][position]))
-                    order.append(self.days_since_record_list[track][position])
+                    lines.append("%s %s (Rank %d, %.3f days)" % (tr, self.format_time(self.time_list[track][position]),
+                                                  position + 1, self.days_since_record_list[track][position]))
+                    if self.order == "date":
+                        order.append(self.days_since_record_list[track][position])
+                    else:
+                        order.append(position + 1)
         lines = [line for _,line in sorted(zip(order,lines))]
         print("Player: %s" % player)
-        print("Track: Time (Days since record)")
+        print("Track: Time (Rank, Days since record)")
         for line in lines:
             print(line)
         return None
 
 def main():
-    if len(sys.argv) != 2:
-        print("correct usage: python %s [player]" % sys.argv[0])
+    if len(sys.argv) != 3:
+        print("correct usage: python %s [player] [orderby:date/ranking]" % sys.argv[0])
         exit()
 
     player = sys.argv[1]
+    order = sys.argv[2]
+    if order != "ranking":
+        order = "date"
 
-    af_calc = AggregateRankingCalculator(player)
+    af_calc = AggregateRankingCalculator(player, order)
 
     af_calc.run()
 

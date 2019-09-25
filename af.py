@@ -19,13 +19,19 @@ import re
 
 class AggregateRankingCalculator():
 
-    def __init__(self):
+    def __init__(self, exclude_glitched_tracks=False, mode="af", exclude_glitched_times=False, threshold=0):
         self.user_list = [[] for _ in range(34)]
         self.time_list = [[] for _ in range(34)]
         self.days_since_record_list = [[] for _ in range(34)]
         self.platform_list = [[] for _ in range(34)]
         self.all_users = {}  # set of all different users
         self.limits = []
+        self.glitched_positions = []
+        self.exclude_glitched_tracks = exclude_glitched_tracks
+        self.mode = mode
+        self.exclude_glitched_times = exclude_glitched_times
+        self.threshold = threshold
+
 
     def run(self):
         mode_list = list(chain(range(1, 36, 2), range(39, 64, 2), range(77, 82, 2))) #list skipping even numbers (relic races)
@@ -33,8 +39,8 @@ class AggregateRankingCalculator():
             self.fetch_rankings_from_csv(mode_index, mode)
 
         self.get_all_users()
-        self.write_af(exclude_glitched_tracks=False, total_times=False, exclude_glitched_times=True,
-                      threshold=10)
+        self.write_af(exclude_glitched_tracks=self.exclude_glitched_tracks, mode=self.mode,
+                      exclude_glitched_times=self.exclude_glitched_times, threshold=self.threshold)
 
     def track_names(self, i):
         name = {0: "Crash Cove",
@@ -140,9 +146,9 @@ class AggregateRankingCalculator():
             len(self.platform_list[j]))]))
             #
 
-    def write_af(self, exclude_glitched_tracks=False, total_times=False, exclude_glitched_times=False, threshold=0):
+    def write_af(self, exclude_glitched_tracks, mode, exclude_glitched_times, threshold):
         af=[]
-        if total_times == True:
+        if mode == "tt":
             filename = "tt"
             threshold = 0
         else:
@@ -161,6 +167,9 @@ class AggregateRankingCalculator():
             print(self.limits, self.glitched_positions, len(self.limits), len(self.glitched_positions))
             extra2 = "_no_glitched_times"
         else:
+            for track in range(len(self.time_list)):
+                self.limits.append(0)
+                self.glitched_positions.append(0)
             extra2 = ""
         n_tracks = len(track_list)
         if threshold == 0:
@@ -181,7 +190,7 @@ class AggregateRankingCalculator():
                     if (user[0] == self.user_list[track][position]) & (user[1] == self.platform_list[track][position]) & (
                             (exclude_glitched_times == False) | (self.time_list[track][position] >= self.limits[track])
                     ):
-                        if total_times == False:
+                        if mode == "af":
                             sum_position += position + 1 - self.glitched_positions[track]
                         else:
                             sum_position += self.time_list[track][position]
@@ -196,7 +205,7 @@ class AggregateRankingCalculator():
                         has_af = False
                         break
             if has_af == True:
-                if total_times == False:
+                if mode == "af":
                     sum_position /= float(submission_number)
                 sum_days /= float(submission_number)
                 af.append((sum_position, submission_number, user, sum_days))
@@ -209,10 +218,32 @@ class AggregateRankingCalculator():
 
 def main():
     if len(sys.argv) != 1:
-        print("correct usage: python %s" % sys.argv[0])
+        print("correct usage: python %s " % sys.argv[0])
         exit()
 
-    af_calc = AggregateRankingCalculator()
+    m = input("Select mode (for Average Finish, enter 'af' / for Total Times, enter 'tt'): ")
+    tracks = input("Remove glitched tracks? (y/n): ")
+    times = input("Remove glitched times (removes times better than current crashteamranking SR)? (y/n): ")
+    thr = input("""Select minimum number of times to appear in the ranking (Enter 0 if you want only players
+                      with full times page to appear): """)
+    mode = "af"
+    if m.rstrip().lstrip() == "tt":
+        mode = "tt"
+    exclude_glitched_tracks = False
+    if tracks.rstrip().lstrip() == "y":
+        exclude_glitched_tracks = True
+    exclude_glitched_times = False
+    if times.rstrip().lstrip() == "y":
+        exclude_glitched_times = True
+    threshold = 10
+    try:
+        if int(thr.rstrip().lstrip()) in range(35):
+            threshold = int(thr.rstrip().lstrip())
+    except:
+        pass
+
+
+    af_calc = AggregateRankingCalculator(exclude_glitched_tracks, mode, exclude_glitched_times, threshold)
 
     af_calc.run()
 
