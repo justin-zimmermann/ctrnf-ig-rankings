@@ -44,6 +44,8 @@ Note the "" are not necessary unless the player has a whitespace character in hi
 ```shell
 python matchups.py player1 player2 etc...
 ```
-and "python last_records.py player"
-
+and 
+```shell
+python last_records.py player
+```
 I'm working on improving the af.py file to be more user friendly and automatically restarting time fetching in case of server connection failure.
