@@ -46,6 +46,6 @@ python matchups.py player1 player2 etc...
 ```
 and 
 ```shell
-python last_records.py player
+python last_records.py player date/ranking
 ```
 I'm working on improving the af.py file to be more user friendly and automatically restarting time fetching in case of server connection failure.
