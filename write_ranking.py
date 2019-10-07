@@ -35,20 +35,6 @@ import write_ranking_for_mode
 
 def main():
     tracks = {
-        "Crash Cove": (1, 100),
-        "Roo Tubes": (3, 100),
-        "Mystery Caves": (5, 100),
-        "ss": (7, 100),
-        "sc": (9, 100),
-        "tt": (11, 100),
-        "Coco Park": (13, 100),
-        "Tiger Temple": (15, 100),
-        "pap": (17, 120),
-        "dc": (19, 100),
-        "Blizzard Bluff": (21, 100),
-        "dm": (23, 100),
-        "pop": (25, 100),
-        "ta": (27, 100),
         "ngl": (29, 800),
         "cc": (31, 100),
         "has": (33, 100),

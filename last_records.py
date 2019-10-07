@@ -158,7 +158,7 @@ class AggregateRankingCalculator():
             tr = "\n%s:" % self.track_names(track)
             for position in range(len(self.user_list[track])):
                 if self.user_list[track][position] == player:
-                    lines.append("%s %s (Rank %d, %.3f days)" % (tr, self.format_time(self.time_list[track][position]),
+                    lines.append("%s %s (Rank %d, done %.3f days ago)" % (tr, self.format_time(self.time_list[track][position]),
                                                   position + 1, self.days_since_record_list[track][position]))
                     if self.order == "date":
                         order.append(self.days_since_record_list[track][position])

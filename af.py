@@ -146,11 +146,19 @@ class AggregateRankingCalculator():
             len(self.platform_list[j]))]))
             #
 
+    def format_time(self, time):
+        if time - (int(time) // 60)*60 < 10:
+            return "%d:0%.3f" % (int(time) / 60, time - (int(time) // 60)*60)
+        else:
+            return "%d:%.3f" % (int(time) / 60, time - (int(time) // 60) * 60)
+
     def write_af(self, exclude_glitched_tracks, mode, exclude_glitched_times, threshold):
         af=[]
         if mode == "tt":
             filename = "tt"
             threshold = 0
+        elif mode == "tp":
+            filename = "tp"
         else:
             filename = "af"
         if exclude_glitched_tracks == True:
@@ -192,6 +200,8 @@ class AggregateRankingCalculator():
                     ):
                         if mode == "af":
                             sum_position += position + 1 - self.glitched_positions[track]
+                        elif mode == "tp":
+                            sum_position += 2000. / (position + 1 - self.glitched_positions[track])
                         else:
                             sum_position += self.time_list[track][position]
                         #if user[0] == "ctr4ever-Justin":
@@ -209,9 +219,21 @@ class AggregateRankingCalculator():
                     sum_position /= float(submission_number)
                 sum_days /= float(submission_number)
                 af.append((sum_position, submission_number, user, sum_days))
-        af.sort()
+        if mode == "tp":
+            af.sort(reverse = True)
+        else:
+            af.sort()
+        if mode == "tt":
+            for i in range(len(af)):
+                af[i][0] = self.format_time(af[i][0])
         print("Writing AF to file")
         with open("output/%s%s%s%s.csv" % (filename, extra, extra2, extra3), 'w') as out:
+            if mode == "af":
+                out.write("Ranking;Average Finish;Tracks played;Username;Platform;Days since record (average)")
+            elif mode == "tt":
+                out.write("Ranking;Total Times;Tracks played;Username;Platform;Days since record (average)")
+            elif mode == "tp":
+                out.write("Ranking;Total Points;Tracks played;Username;Platform;Days since record (average)")
             for i, entry in enumerate(af):
                 #print("%s;%s;%s;%s;%s" % (i+1, entry[0], entry[1][0], entry[1][1], entry[2]))
                 out.write("%s;%s;%s;%s;%s;%s\n" % (i+1, entry[0], entry[1], entry[2][0], entry[2][1], entry[3]))
@@ -221,7 +243,7 @@ def main():
         print("correct usage: python %s " % sys.argv[0])
         exit()
 
-    m = input("Select mode (for Average Finish, enter 'af' / for Total Times, enter 'tt'): ")
+    m = input("Select mode (for Average Finish, enter 'af' / for Total Times, enter 'tt' / for Total Points, enter 'tp'): ")
     tracks = input("Remove glitched tracks? (y/n): ")
     times = input("Remove glitched times (removes times better than current crashteamranking SR)? (y/n): ")
     thr = input("""Select minimum number of times to appear in the ranking (Enter 0 if you want only players
@@ -229,6 +251,8 @@ def main():
     mode = "af"
     if m.rstrip().lstrip() == "tt":
         mode = "tt"
+    if m.rstrip().lstrip() == "tp":
+        mode = "tp"
     exclude_glitched_tracks = False
     if tracks.rstrip().lstrip() == "y":
         exclude_glitched_tracks = True
