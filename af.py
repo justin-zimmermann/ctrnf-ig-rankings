@@ -20,10 +20,11 @@ import re
 class AggregateRankingCalculator():
 
     def __init__(self, exclude_glitched_tracks=False, mode="af", exclude_glitched_times=False, threshold=0):
-        self.user_list = [[] for _ in range(34)]
-        self.time_list = [[] for _ in range(34)]
-        self.days_since_record_list = [[] for _ in range(34)]
-        self.platform_list = [[] for _ in range(34)]
+        self.n = 35
+        self.user_list = [[] for _ in range(self.n)]
+        self.time_list = [[] for _ in range(self.n)]
+        self.days_since_record_list = [[] for _ in range(self.n)]
+        self.platform_list = [[] for _ in range(self.n)]
         self.all_users = {}  # set of all different users
         self.limits = []
         self.glitched_positions = []
@@ -34,7 +35,7 @@ class AggregateRankingCalculator():
 
 
     def run(self):
-        mode_list = list(chain(range(1, 36, 2), range(39, 64, 2), range(77, 82, 2))) #list skipping even numbers (relic races)
+        mode_list = list(chain(range(1, 36, 2), range(39, 64, 2), range(77, 84, 2))) #list skipping even numbers (relic races)
         for mode_index, mode in enumerate(mode_list):
             self.fetch_rankings_from_csv(mode_index, mode)
 
@@ -71,18 +72,19 @@ class AggregateRankingCalculator():
                 25: "Clockwork Wumpa",
                 26: "Thunderstruck",
                 27: "Assembly Lane",
-                28: "Android Alley",
+                28: "Nina's Nightmare",
                 29: "Electron Avenue",
                 30: "Hyper Spaceway",
                 31: "Twilight Tour",
                 32: "Prehistoric Playground",
-                33: "Spyro Circuit"}
+                33: "Spyro Circuit",
+                34: "Android Alley"}
         return name[i]
 
     def get_track_limits(self):
         res = requests.get(r"https://crashteamranking.com/nfrecords/")
         html = str(res.content)
-        limits = re.findall("[0-9]:[0-9]{2}.[0-9]{2}", html)[:35]
+        limits = re.findall("[0-9]:[0-9]{2}.[0-9]{2}", html)[:self.n+1]
         limits = [int(limit[0])*60 + int(limit[2:4]) + float(limit[5:7])/100. for limit in limits]
         limit_correct_order = {0:0,
                                1:1,
@@ -112,12 +114,13 @@ class AggregateRankingCalculator():
                                25:25,
                                26:26,
                                27:27,
-                               28:28,
+                               28:35,
                                29:29,
                                30:30,
                                31:32,
                                32:33,
-                               33:34}
+                               33:34,
+                               34:28}
         return [limits[value] for key, value in limit_correct_order.items()]
 
     def get_glitched_positions(self):
@@ -141,7 +144,7 @@ class AggregateRankingCalculator():
     def get_all_users(self):
         self.all_users = set([(self.user_list[0][i], self.platform_list[0][i]) for i in range(
             len(self.platform_list[0]))])
-        for j in range(1, 34):
+        for j in range(1, self.n):
             self.all_users = self.all_users.union(set([(self.user_list[j][i], self.platform_list[j][i]) for i in range(
             len(self.platform_list[j]))]))
             #
@@ -162,8 +165,8 @@ class AggregateRankingCalculator():
         else:
             filename = "af"
         if exclude_glitched_tracks == True:
-            track_list = list(chain(range(0, 1), range(2, 5), range(10, 14), range(15, 16), range(18, 25), range(
-                27, 29), range(30, 31)))
+            track_list = list(chain(range(0, 1), range(2, 5), range(10, 14), range(15, 16), range(18, 24), range(
+                27, 29), range(30, 33), range(34, 35)))
             #print(track_list)
             extra = "_no_glitched_tracks"
         else:
